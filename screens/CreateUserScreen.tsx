@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { View, Button, TextInput, ScrollView, StyleSheet } from "react-native";
-import firebase from '../database/firebase'
+import { View, Button, TextInput, ScrollView, StyleSheet, StatusBar } from "react-native";
+import firebase from "../database/firebase";
+import { FirebaseResponse } from "../types";
 
 const CreateUserScreen = () => {
   const initialState = {
@@ -15,13 +16,20 @@ const CreateUserScreen = () => {
     setstate({ ...state, [name]: value });
   };
 
-	const addNewUser = async () =>{
-		await firebase.db.collection('users').add({
-			name: state.name,
-			email: state.email,
-			phone: state.phone
-		})
-	}
+  const addNewUser = async () => {
+    await firebase.db
+      .collection("users")
+      .add({
+        name: state.name,
+        email: state.email,
+        phone: state.phone,
+      })
+      .then((response: FirebaseResponse) => {
+        alert(`Your id: ${response.id}`);
+        setstate(initialState);
+      })
+      .catch((error: string) => console.log(error));
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -47,7 +55,7 @@ const CreateUserScreen = () => {
         />
       </View>
       <View>
-        <Button title="Save user" onPress={addNewUser} />
+        <Button title="Save user" onPress={addNewUser}/>
       </View>
     </ScrollView>
   );
@@ -56,14 +64,17 @@ const CreateUserScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#fff",
     padding: 35,
+    marginTop: StatusBar.currentHeight || 0,
   },
   inputGroup: {
     flex: 1,
     padding: 0,
-    marginBottom: 15,
+    marginBottom: 25,
+    paddingBottom: 5,
     borderBottomWidth: 1,
-    borderBottomColor: "#cccccc",
+    borderBottomColor: "#cccccc"
   },
   loader: {
     left: 0,
