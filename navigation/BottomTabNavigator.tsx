@@ -5,6 +5,7 @@ import * as React from "react";
 
 import TabOneScreen from "../screens/UsersList";
 import TabTwoScreen from "../screens/CreateUserScreen";
+import TabTreeScreen from "../screens/UserDetailScreen";
 
 const BottomTab = createBottomTabNavigator();
 
@@ -28,6 +29,15 @@ export default function BottomTabNavigator() {
       <BottomTab.Screen
         name="Create new user"
         component={TabTwoNavigator}
+        options={{
+          tabBarIcon: ({ colorScheme }: any) => (
+            <TabBarIcon name="ios-code" color={colorScheme} />
+          ),
+        }}
+      />
+      <BottomTab.Screen
+        name="Edit new user"
+        component={TabTreeNavigator}
         options={{
           tabBarIcon: ({ colorScheme }: any) => (
             <TabBarIcon name="ios-code" color={colorScheme} />
@@ -70,5 +80,19 @@ function TabTwoNavigator() {
         options={{ headerTitle: "Create new user" }}
       />
     </TabTwoStack.Navigator>
+  );
+}
+
+const TabTreeStack = createStackNavigator();
+
+function TabTreeNavigator() {
+  return (
+    <TabTreeStack.Navigator>
+      <TabTreeStack.Screen
+        name="TabTreeScreen"
+        component={TabTreeScreen}
+        options={{ headerTitle: "Edit user" }}
+      />
+    </TabTreeStack.Navigator>
   );
 }

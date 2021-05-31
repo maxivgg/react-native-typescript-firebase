@@ -1,21 +1,54 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import BottomTabNavigator from "./navigation/BottomTabNavigator";
+import { LogBox } from 'react-native';
+
+import CreateUserScreen from "./screens/CreateUserScreen";
+import UserDetailScreen from "./screens/UserDetailScreen";
+import UsersList from "./screens/UsersList";
+import { StatusBar } from "react-native";
+
+LogBox.ignoreLogs(['Setting a timer']);
 
 const Stack = createStackNavigator();
 
-const RootNavigator = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="Root" component={BottomTabNavigator} />
-  </Stack.Navigator>
-);
+function MyStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: "#000",
+        },
+        headerTintColor: "#fff",
+        headerTitleStyle: {
+          fontWeight: "bold",
+        },
+      }}
+    >
+      <Stack.Screen
+        name="UsersList"
+        component={UsersList}
+        options={{ title: "Users List" }}
+      />
+      <Stack.Screen
+        name="CreateUserScreen"
+        component={CreateUserScreen}
+        options={{ title: "Create a New User" }}
+      />
+      <Stack.Screen
+        name="UserDetailScreen"
+        component={UserDetailScreen}
+        options={{ title: "User Detail" }}
+      />
+    </Stack.Navigator>
+  );
+}
 
 export default function App() {
   return (
     <NavigationContainer>
-      <RootNavigator />
+      <StatusBar animated={true} barStyle="light-content" />
+      <MyStack />
     </NavigationContainer>
   );
 }

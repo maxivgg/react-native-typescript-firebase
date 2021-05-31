@@ -1,61 +1,65 @@
 import React, { useState } from "react";
-import { View, Button, TextInput, ScrollView, StyleSheet, StatusBar } from "react-native";
+import { View, StyleSheet, TextInput, ScrollView } from "react-native";
 import firebase from "../database/firebase";
-import { FirebaseResponse } from "../types";
+import { Button } from 'react-native-elements';
 
-const CreateUserScreen = () => {
-  const initialState = {
+type TProps = { navigation: { navigate: (arg0: string) => void } };
+
+const AddUserScreen = (props: TProps) => {
+  const initalState = {
     name: "",
     email: "",
     phone: "",
   };
-
-  const [state, setstate] = useState(initialState);
-
-  const handleChangeText = (name: string, value: string) => {
-    setstate({ ...state, [name]: value });
+  const [state, setState] = useState(initalState);
+  const [loading, setLoading] = useState(false);
+  const handleChangeText = (value: string, name: string) => {
+    setState({ ...state, [name]: value });
   };
-
-  const addNewUser = async () => {
-    await firebase.db
-      .collection("users")
-      .add({
-        name: state.name,
-        email: state.email,
-        phone: state.phone,
-      })
-      .then((response: FirebaseResponse) => {
-        alert(`Your id: ${response.id}`);
-        setstate(initialState);
-      })
-      .catch((error: string) => console.log(error));
+  const saveNewUser = async () => {
+    setLoading(true);
+    if (state.name === "") {
+      alert("Please provide a name");
+    } else {
+      try {
+        await firebase.db.collection("users").add({
+          name: state.name,
+          email: state.email,
+          phone: state.phone,
+        });
+        props.navigation.navigate("UsersList");
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    setLoading(false);
   };
-
   return (
     <ScrollView style={styles.container}>
-      <View>
+      <View style={styles.inputGroup}>
         <TextInput
-          style={styles.inputGroup}
-          placeholder="Name user"
-          onChangeText={(value) => handleChangeText("name", value)}
+          placeholder="Name"
+          onChangeText={(value) => handleChangeText(value, "name")}
+          value={state.name}
+        />
+      </View>
+      <View style={styles.inputGroup}>
+        <TextInput
+          placeholder="Email"
+          multiline={true}
+          onChangeText={(value) => handleChangeText(value, "email")}
+          value={state.email}
+        />
+      </View>
+      <View style={styles.inputGroup}>
+        <TextInput
+          placeholder="phone"
+          onChangeText={(value) => handleChangeText(value, "phone")}
+          value={state.phone}
         />
       </View>
       <View>
-        <TextInput
-          style={styles.inputGroup}
-          placeholder="Email user"
-          onChangeText={(value) => handleChangeText("email", value)}
-        />
-      </View>
-      <View>
-        <TextInput
-          style={styles.inputGroup}
-          placeholder="Phone user"
-          onChangeText={(value) => handleChangeText("phone", value)}
-        />
-      </View>
-      <View>
-        <Button title="Save user" onPress={addNewUser}/>
+        <Button loading={loading} title="Save User" onPress={() => saveNewUser()} />
       </View>
     </ScrollView>
   );
@@ -64,27 +68,15 @@ const CreateUserScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     padding: 35,
-    marginTop: StatusBar.currentHeight || 0,
   },
   inputGroup: {
     flex: 1,
     padding: 0,
-    marginBottom: 25,
-    paddingBottom: 5,
+    marginBottom: 15,
     borderBottomWidth: 1,
-    borderBottomColor: "#cccccc"
-  },
-  loader: {
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    position: "absolute",
-    alignItems: "center",
-    justifyContent: "center",
+    borderBottomColor: "#cccccc",
   },
 });
 
-export default CreateUserScreen;
+export default AddUserScreen;

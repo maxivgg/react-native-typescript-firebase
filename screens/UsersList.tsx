@@ -1,17 +1,12 @@
-import React, { useEffect, useState } from "react";
-import {
-  SafeAreaView,
-  FlatList,
-  StyleSheet,
-  StatusBar,
-  ListRenderItemInfo,
-} from "react-native";
+import React, { useState, useEffect } from "react";
+import { ListItem, Avatar } from "react-native-elements";
+import { ScrollView } from "react-native-gesture-handler";
 import firebase from "../database/firebase";
 import { FirebaseResponse, User } from "../types";
-import { ListItem, Avatar } from "react-native-elements";
+import { FAB } from "react-native-elements";
 
-const UsersList = () => {
-  const [users, setusers] = useState([] as User[]);
+const UserList = (props: any) => {
+  const [users, setUsers] = useState([] as User[]);
 
   useEffect(() => {
     firebase.db.collection("users").onSnapshot((querySnapshot: any) => {
@@ -25,52 +20,53 @@ const UsersList = () => {
           phone,
         });
       });
-      setusers(usersFirebase);
+      setUsers(usersFirebase);
     });
   }, []);
 
-  const renderItem = ({ item }: ListRenderItemInfo<User>) => (
-    <ListItem key={item.id} >
-      <Avatar
-        source={{
-          uri: "https://avatars.githubusercontent.com/u/45208874?s=400&u=ecdb30d5b244ecbd2515654392312313fe8a1e5f&v=4",
-        }}
-        rounded
-      />
-      <ListItem.Chevron />
-      <ListItem.Content>
-        <ListItem.Title>{item.name}</ListItem.Title>
-        <ListItem.Subtitle>{item.email}</ListItem.Subtitle>
-      </ListItem.Content>
-    </ListItem>
-  );
-
   return (
-    <SafeAreaView style={styles.container}>
-      <FlatList
-        data={users}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+    <React.Fragment>
+      <FAB
+        onPress={() => props.navigation.navigate("CreateUserScreen")}
+        title="Add user"
+        style={{
+          position: "absolute",
+          right: 10,
+          bottom: 10,
+          zIndex: 99,
+        }}
       />
-    </SafeAreaView>
+
+      <ScrollView>
+        {users.map((user) => {
+          return (
+            <ListItem
+              key={user.id}
+              bottomDivider
+              onPress={() => {
+                props.navigation.navigate("UserDetailScreen", {
+                  userId: user.id,
+                });
+              }}
+            >
+              <ListItem.Chevron />
+              <Avatar
+                size="medium"
+                source={{
+                  uri: "https://avatars.githubusercontent.com/u/45208874?s=400&u=ecdb30d5b244ecbd2515654392312313fe8a1e5f&v=4",
+                }}
+                rounded
+              />
+              <ListItem.Content>
+                <ListItem.Title>{user.name}</ListItem.Title>
+                <ListItem.Subtitle>{user.email}</ListItem.Subtitle>
+              </ListItem.Content>
+            </ListItem>
+          );
+        })}
+      </ScrollView>
+    </React.Fragment>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    marginTop: StatusBar.currentHeight || 0,
-  },
-  item: {
-    flex: 1,
-    marginVertical: 8,
-    border: 10,
-    margin: 15,
-    paddingTop: 10,
-    paddingBottom: 10,
-    borderBottomColor: "#cccccc",
-  },
-});
-
-export default UsersList;
+export default UserList;
