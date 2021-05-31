@@ -1,14 +1,14 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { LogBox } from 'react-native';
+import { LogBox, Platform } from 'react-native';
 
 import CreateUserScreen from "./screens/CreateUserScreen";
 import UserDetailScreen from "./screens/UserDetailScreen";
 import UsersList from "./screens/UsersList";
 import { StatusBar } from "react-native";
 
-LogBox.ignoreLogs(['Setting a timer']);
+if (Platform.OS !== "web") LogBox.ignoreLogs(['Setting a timer']);
 
 const Stack = createStackNavigator();
 
